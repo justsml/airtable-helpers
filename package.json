@@ -1,6 +1,6 @@
 {
   "name": "begin-app",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Begin basic Hello World! app",
   "scripts": {
     "lint": "eslint . --ignore-pattern node_modules --fix",
@@ -15,5 +15,8 @@
     "tap-spec": "^5.0.0",
     "tape": "^4.11.0",
     "tiny-json-http": "^7.1.2"
+  },
+  "dependencies": {
+    "airtable": "^0.7.2"
   }
 }
