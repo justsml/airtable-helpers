@@ -5,6 +5,7 @@ awaken-7tl
 
 @http
 get /
+get /objectives
 
 @tables
 data
