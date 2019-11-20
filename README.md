@@ -1,2 +1,0 @@
-# airtable-helpers
-Begin app
