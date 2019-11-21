@@ -1,5 +1,6 @@
 const fetch = require('node-fetch')
 
+// Endorsement%20Requirements
 function getObjectives() {
   return fetch("https://api.airtable.com/v0/appVrtcS4vUYVuiD3/Objectives?maxRecords=250&view=Grid%20view", {
     headers: {
@@ -23,7 +24,6 @@ function getObjectives() {
       }
     })
   })
-
 }
 
 // Enable secure sessions, express-style middleware, and more:
