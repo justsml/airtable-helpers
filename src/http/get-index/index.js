@@ -58,8 +58,7 @@ async function http (req) {
     statusCode: 201,
     headers: {'content-type': 'application/json; charset=utf8'},
     body: JSON.stringify({ok: true}),
-    cors: true,
-  }
+      }
 }
 */
 
