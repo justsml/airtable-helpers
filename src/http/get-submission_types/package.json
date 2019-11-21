@@ -1,0 +1,7 @@
+{
+  "name": "begin-app-get-submission_types",
+  "dependencies": {
+    "@architect/functions": "latest",
+    "@begin/data": "latest"
+  }
+}
