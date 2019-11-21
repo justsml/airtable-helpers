@@ -1,38 +1,27 @@
-// Enable secure sessions, express-style middleware, and more:
-// https://docs.begin.com/en/functions/http/
-//
-// let begin = require('@architect/functions')
+const fetch = require('node-fetch')
 
-let html = `
-<!doctype html>
-<html lang=en>
-  <head>
-    <meta charset=utf-8>
-    <title>Hi!</title>
-    <link rel="stylesheet" href="https://static.begin.app/starter/default.css">
-    <link href="data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" rel="icon" type="image/x-icon" />
-  </head>
-  <body>
-    <h1 class="center-text">
-      Hello world!
-    </h1>
-    <p class="center-text">
-      Your new route is ready to go!
-    </p>
-    <p class="center-text">
-      Learn more about building <a href="https://docs.begin.com/en/functions/http/" class="link" target="_blank">Begin HTTP functions here</a>.
-    </p>
-  </body>
-</html>
-`
+function getData(tableName) {
+  return fetch(`https://api.airtable.com/v0/appVrtcS4vUYVuiD3/${encodeURIComponent(tableName)}?maxRecords=250&view=Grid%20view`, {
+    headers: {
+      'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log(tableName, JSON.stringify(data, null, 2))
+    return data.records.map(record => {
+      return record
+    })
+  })
+}
 
-// HTTP function
 exports.handler = async function http(req) {
-  console.log(req)
+  // console.log(req)
+  const body = await getData('Courses').catch(console.error)
   return {
     headers: {
-      'content-type': 'text/html; charset=utf8'
+      'content-type': 'application/json; charset=utf8'
     },
-    body: html
+    body: JSON.stringify(body)
   }
 }

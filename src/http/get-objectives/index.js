@@ -9,7 +9,7 @@ function getObjectives() {
   })
   .then(res => res.json())
   .then(data => {
-    console.log(data)
+    console.log(JSON.stringify(data, null, 2))
     return data.records.map(record => {
       // id, fields.1-3, fields.Objective, fields.['Display Name'], fields['Reviewer Facing Description']
       return {
@@ -20,7 +20,8 @@ function getObjectives() {
           record.fields['3']
         ],
         display: record.fields['Display Name'],
-        description: record.fields['Reviewer Facing Description']
+        descriptionForReviewer: record.fields['Reviewer Facing Description'],
+        descriptionForStudent: ['Student Facing Description']
       }
     })
   })
