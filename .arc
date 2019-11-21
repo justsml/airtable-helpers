@@ -6,6 +6,7 @@ awaken-7tl
 @http
 get /
 get /objectives
+get /courses
 
 @tables
 data
