@@ -9,6 +9,7 @@ get /objectives
 get /courses
 get /endorsement-requirements
 get /student-next-steps
+get /submission-types
 
 @tables
 data
