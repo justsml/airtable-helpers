@@ -12,6 +12,7 @@ function getData(tableName) {
     return data.records.map(record => {
       return {
         id: record.id,
+        'Name': record.fields['Name'],
         'HackerRank Tests': record.fields['HackerRank Tests'],
         'Endorsement Requirements': record['Endorsement Requirements'],
         'Endorsement Unit Design': record.fields['Endorsement Unit Design']
