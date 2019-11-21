@@ -1,7 +1,7 @@
 const fetch = require('node-fetch')
 
 function getObjectives() {
-  return fetch("https://api.airtable.com/v0/appVrtcS4vUYVuiD3/Objectives?maxRecords=3&view=Grid%20view", {
+  return fetch("https://api.airtable.com/v0/appVrtcS4vUYVuiD3/Objectives?maxRecords=250&view=Grid%20view", {
     headers: {
       'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
     }
