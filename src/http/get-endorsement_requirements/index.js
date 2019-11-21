@@ -19,6 +19,7 @@ exports.handler = async function http(req) {
   // console.log(req)
   const body = await getData('Endorsement Requirements').catch(console.error)
   return {
+    cors: true,
     headers: {
       'content-type': 'application/json; charset=utf8'
     },

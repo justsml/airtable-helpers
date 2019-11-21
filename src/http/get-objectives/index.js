@@ -39,6 +39,7 @@ exports.handler = async function http(req) {
   // console.log(req)
   const body = await getObjectives().catch(console.error)
   return {
+    cors: true,
     headers: {
       'content-type': 'application/json; charset=utf8'
     },
