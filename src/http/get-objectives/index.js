@@ -8,6 +8,7 @@ function getObjectives() {
   })
   .then(res => res.json())
   .then(data => {
+    console.log(data)
     return data.records.map(record => {
       // id, fields.1-3, fields.Objective, fields.['Display Name'], fields['Reviewer Facing Description']
       return {
@@ -38,8 +39,8 @@ exports.handler = async function http(req) {
   const body = await getObjectives().catch(console.error)
   return {
     headers: {
-      'content-type': 'text/html; charset=utf8'
+      'content-type': 'application/json; charset=utf8'
     },
-    body
+    body: JSON.stringify(body)
   }
 }
