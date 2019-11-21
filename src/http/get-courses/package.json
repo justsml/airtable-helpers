@@ -1,0 +1,7 @@
+{
+  "name": "begin-app-get-courses",
+  "dependencies": {
+    "@architect/functions": "latest",
+    "@begin/data": "latest"
+  }
+}

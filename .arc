@@ -6,6 +6,9 @@ awaken-7tl
 @http
 get /
 get /objectives
+get /courses
+get /endorsement-requirements
+get /student-next-steps
 
 @tables
 data
