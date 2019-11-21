@@ -3,6 +3,6 @@
   "dependencies": {
     "@architect/functions": "latest",
     "@begin/data": "latest",
-    "airtable": "^0.7.2"
+    "node-fetch": "^2.6.0"
   }
 }
