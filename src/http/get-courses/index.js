@@ -10,7 +10,12 @@ function getData(tableName) {
   .then(data => {
     console.log(tableName, JSON.stringify(data, null, 2))
     return data.records.map(record => {
-      return record
+      return {
+        id: record.id,
+        'HackerRank Tests': record.fields['HackerRank Tests'],
+        'Endorsement Requirements': record['Endorsement Requirements'],
+        'Endorsement Unit Design': record.fields['Endorsement Unit Design']
+      }
     })
   })
 }
