@@ -1,0 +1,7 @@
+{
+  "name": "begin-app-get-form-000scheduledId",
+  "dependencies": {
+    "@architect/functions": "latest",
+    "@begin/data": "latest"
+  }
+}
