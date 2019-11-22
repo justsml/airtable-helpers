@@ -105,7 +105,10 @@ exports.handler = async function http(req) {
   const objectives = await getObjectives(submissionType.objectives).catch(console.error)
   // console.log('OBJECTIVES', objectives)
 
-  const body = { objectives, interview: scheduledInterview }
+  const body = {
+    interview: scheduledInterview,
+    objectives,
+  }
   return {
     headers: {
       'Access-Control-Allow-Origin': '*',
