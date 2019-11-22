@@ -12,6 +12,7 @@ get /student-next-steps
 get /submission-types
 post /submissions
 get /form
+get /form/:scheduledId
 
 @tables
 data
