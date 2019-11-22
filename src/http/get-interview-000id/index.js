@@ -14,16 +14,11 @@ function buildQueryForIds(ids) {
 
 */
 
-// function buildFieldsParam(fields) {
-//   // fields%5B%5D=Objective
-//   // fields%5B%5D=Reviewer%20Facing%20Description
-//   return fields.map(field => `${encodeURIComponent('fields[]')}=${encodeURIComponent(field)}`).join('&')
-// }
+function buildFieldsParam(fields) {
+  return fields.map(field => `${encodeURIComponent('fields[]')}=${encodeURIComponent(field)}`).join('&');
+}
 
 function getScheduledById(id) {
-  // const fields = buildFieldsParam(['Student'])
-  // const fields = buildFieldsParam(['Student', 'Type', 'Name', 'Calendar Invite Name', 'Start Time', 'End Time'])
-  // console.log('FIELDS', fields)
   return fetch(`https://api.airtable.com/v0/appVrtcS4vUYVuiD3/tblxsSqOyJAFDOzA4/${id}`, {
     headers: {
       'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
@@ -46,8 +41,9 @@ function getScheduledById(id) {
 
 function getObjectives(objectiveIds) {
   const filterByFormula = buildQueryForIds(objectiveIds)
+  const fields = ['Display Name', 'Objective', 'Reviewer Facing Description', 'Student Facing Description', '1', '2', '3']
   console.log('filterByFormula', filterByFormula)
-  return fetch(`https://api.airtable.com/v0/appVrtcS4vUYVuiD3/Objectives?maxRecords=250&view=Grid%20view&filterByFormula=${filterByFormula}`, {
+  return fetch(`https://api.airtable.com/v0/appVrtcS4vUYVuiD3/Objectives?filterByFormula=${filterByFormula}&${buildFieldsParam(fields)}`, {
     headers: {
       'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
     }
@@ -65,9 +61,6 @@ function getObjectives(objectiveIds) {
         score1: record.fields['1'],
         score2: record.fields['2'],
         score3: record.fields['3'],
-        // 'HackerRank Tests': record.fields['HackerRank Tests'],
-        // 'Endorsement Requirements': record['Endorsement Requirements'],
-        // 'Endorsement Unit Design': record.fields['Endorsement Unit Design']
       }
     })
   })
@@ -76,34 +69,33 @@ function getObjectives(objectiveIds) {
 
 function getSubmissionType(id) {
   const tableId = 'tblbVmHIKWpDipzUh'
-  return fetch(`https://api.airtable.com/v0/appVrtcS4vUYVuiD3/${tableId}/${id}`, {
+  const filterByFormula = buildQueryForIds([id])
+  const fields = buildFieldsParam(['Objectives', 'Display Name', 'Student Facing Description', 'Name', 'Course'])
+  return fetch(`https://api.airtable.com/v0/appVrtcS4vUYVuiD3/${tableId}?filterByFormula=${filterByFormula}&${fields}`, {
     headers: {
       'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
     }
   })
   .then(res => res.json())
   .then(result => {
-    // console.log('getSubmissionType', JSON.stringify(data, null, 2))
+    const record = result.records[0]
+    console.log('getSubmissionType', JSON.stringify(record, null, 2))
     return {
-      id: result.id,
-      objectives: result.fields.Objectives,
-      endorsementRequirements: result.fields['Endorsement Requirements'],
-      displayName: result.fields['Display Name'],
-      studentFacingDescription: result.fields['Student Facing Description'],
-      name: result.fields['Name'],
-      courseId: result.fields['Course'] && result.fields['Course'][0],
+      id: record.id,
+      objectives: record.fields.Objectives,
+      displayName: record.fields['Display Name'],
+      studentFacingDescription: record.fields['Student Facing Description'],
+      name: record.fields['Name'],
+      courseId: record.fields['Course'] && record.fields['Course'][0],
     }
   })
 }
 
 
 exports.handler = async function http(req) {
-  // console.log(req)
   const scheduledInterview = await getScheduledById(req.pathParameters.id).catch(console.error)
   const submissionType = await getSubmissionType(scheduledInterview.submissionTypeId).catch(console.error)
-  // console.log('OBJECTIVE_IDs', submissionType.objectives)
   const objectives = await getObjectives(submissionType.objectives).catch(console.error)
-  // console.log('OBJECTIVES', objectives)
 
   const body = {
     interview: scheduledInterview,
