@@ -1,0 +1,7 @@
+{
+  "name": "begin-app-get-interview-000id",
+  "dependencies": {
+    "@architect/functions": "latest",
+    "@begin/data": "latest"
+  }
+}
