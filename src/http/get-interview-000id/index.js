@@ -58,10 +58,10 @@ function getObjectives(objectiveIds) {
     return data.records.map(record => {
       return {
         id: record.id,
-        'Display Name': record.fields['Display Name'],
-        'Objective': record.fields['Objective'],
-        'Reviewer Facing Description': record.fields['Reviewer Facing Description'],
-        'Student Facing Description': record.fields['Student Facing Description'],
+        displayName: record.fields['Display Name'],
+        objective: record.fields['Objective'],
+        reviewerFacingDescription: record.fields['Reviewer Facing Description'],
+        studentFacingDescription: record.fields['Student Facing Description'],
         score1: record.fields['1'],
         score2: record.fields['2'],
         score3: record.fields['3'],
