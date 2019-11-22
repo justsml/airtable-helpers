@@ -11,6 +11,7 @@ get /endorsement-requirements
 get /student-next-steps
 get /submission-types
 post /submissions
+get /form
 
 @tables
 data
