@@ -13,6 +13,7 @@ get /submission-types
 post /submissions
 get /form
 get /form/:scheduledId
+get /interview/:id
 
 @tables
 data
