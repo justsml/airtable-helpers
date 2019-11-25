@@ -15,7 +15,7 @@ function buildQueryForIds(ids) {
 */
 
 function buildFieldsParam(fields) {
-  return fields.map(field => `${encodeURIComponent('fields[]')}=${encodeURIComponent(field)}`).join('&');
+  return fields.map(field => `${encodeURIComponent('fields[]')}=${encodeURIComponent(field)}`).join('&')
 }
 
 function getScheduledById(id) {
