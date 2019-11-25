@@ -26,7 +26,7 @@ function getScheduledById(id) {
   })
   .then(res => res.json())
   .then(results => {
-    console.log('SCHEDULED_BY_ID', results)
+    // console.log('SCHEDULED_BY_ID', results)
     if (!results.fields.Student && !results.fields.Student[0]) {
       console.warn('No Student ID Found!')
     }
@@ -45,7 +45,7 @@ function getScheduledById(id) {
 function getObjectives(objectiveIds) {
   const filterByFormula = buildQueryForIds(objectiveIds)
   const fields = ['Display Name', 'Objective', 'Reviewer Facing Description', 'Student Facing Description', '1', '2', '3']
-  console.log('filterByFormula', filterByFormula)
+  // console.log('filterByFormula', filterByFormula)
   return fetch(`https://api.airtable.com/v0/appVrtcS4vUYVuiD3/Objectives?filterByFormula=${filterByFormula}&${buildFieldsParam(fields)}`, {
     headers: {
       'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
@@ -53,7 +53,7 @@ function getObjectives(objectiveIds) {
   })
   .then(res => res.json())
   .then(data => {
-    console.log('OBJECTIVES', JSON.stringify(data, null, 2))
+    // console.log('OBJECTIVES', JSON.stringify(data, null, 2))
     return data.records.map(record => {
       return {
         id: record.id,
@@ -82,7 +82,7 @@ function getSubmissionType(id) {
   .then(res => res.json())
   .then(result => {
     const record = result.records[0]
-    console.log('getSubmissionType', JSON.stringify(record, null, 2))
+    // console.log('getSubmissionType', JSON.stringify(record))
     return {
       id: record.id,
       objectives: record.fields.Objectives,

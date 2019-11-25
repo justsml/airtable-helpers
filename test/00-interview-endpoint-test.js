@@ -19,43 +19,22 @@ test('Start sandbox', async t => {
   t.ok(end, 'Sandbox started!')
 })
 
-test('get / (continuation-passing style)', t => {
-  t.plan(1)
-  tiny.get({url},
-  function win (err, result) {
-    if (err) {
-      t.fail(err)
-      if (err.message.includes('404') || err.code === 'ECONNREFUSED')
-        console.log(didNotLoad)
-    } else {
-      t.ok(result, 'Got result', console.log(result.body.toString().substring(0,50) + '...'))
-    }
-  })
-})
 
-test('get / (promise style)', t => {
-  t.plan(1)
-  tiny.get({url})
+test('get /interview/:id', t => {
+  t.plan(3)
+  tiny.get({url: `${url}/interview/recfmDZDo4oG3QkP5`})
     .then(function win (result) {
-      t.ok(result, 'Got result:', console.log(result.body.toString().substring(0,50) + '...'))
+      const json = result.body
+      t.true(!!json.objectives, 'Got list of Objectives.')
+      t.true(!!json.interview, 'Got Interview details.')
+      t.true(!!json.interview.displayTitle, 'Has displayTitle in interview details.')
     })
     .catch(function fail (err) {
+      console.error('FAIL', err)
       t.fail(err)
       if (err.message.includes('404') || err.code === 'ECONNREFUSED')
         console.log(didNotLoad)
     })
-})
-
-test('get / (async/await style)', async t => {
-  t.plan(1)
-  try {
-    let result = await tiny.get({url})
-    t.ok(result, 'Got result:', console.log(result.body.toString().substring(0,50) + '...'))
-  } catch (err) {
-    t.fail(err)
-    if (err.message.includes('404') || err.code === 'ECONNREFUSED')
-      console.log(didNotLoad)
-  }
 })
 
 test('Shut down sandbox', t=> {
