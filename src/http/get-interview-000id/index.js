@@ -19,6 +19,7 @@ function buildFieldsParam(fields) {
 }
 
 function getScheduledById(id) {
+  if (!process.env.AIRTABLE_API_KEY) throw new Error('Fatal Error: AIRTABLE_API_KEY required!')
   return fetch(`https://api.airtable.com/v0/appVrtcS4vUYVuiD3/tblxsSqOyJAFDOzA4/${id}`, {
     headers: {
       'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
