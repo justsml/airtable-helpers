@@ -7,7 +7,6 @@ awaken-7tl
 get /
 get /objectives
 get /courses
-get /endorsement-requirements
 get /submission-types
 post /submissions
 get /interview/:id
