@@ -24,3 +24,5 @@ jobs:
         npm test
       env:
         CI: true
+        AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+
