@@ -38,7 +38,7 @@ function getScheduledById(id) {
       displayTitle: results.fields.Name,
       description: results.fields['Calendar Invite Name'],
       startTime: results.fields['Start Time'] && results.fields['Start Time'][0],
-      endTime: results.fields['End Time'] && results.fields['End Time'][0],
+      duration: results.fields['Duration'],
     }
   })
 }
