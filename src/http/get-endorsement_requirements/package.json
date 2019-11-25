@@ -1,8 +1,0 @@
-{
-  "name": "begin-app-get-endorsement_requirements",
-  "dependencies": {
-    "@architect/functions": "latest",
-    "@begin/data": "latest",
-    "node-fetch": "^2.6.0"
-  }
-}
