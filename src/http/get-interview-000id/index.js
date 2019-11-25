@@ -27,14 +27,17 @@ function getScheduledById(id) {
   .then(res => res.json())
   .then(results => {
     console.log('SCHEDULED_BY_ID', results)
+    if (!results.fields.Student && !results.fields.Student[0]) {
+      console.warn('No Student ID Found!')
+    }
     return {
       id: results.id,
-      studentId: results.fields.Student[0],
-      submissionTypeId: results.fields.Type[0],
+      studentId: results.fields.Student && results.fields.Student[0],
+      submissionTypeId: results.fields && results.fields.Type[0],
       displayTitle: results.fields.Name,
       description: results.fields['Calendar Invite Name'],
-      startTime: results.fields['Start Time'][0],
-      endTime: results.fields['End Time'][0],
+      startTime: results.fields['Start Time'] && results.fields['Start Time'][0],
+      endTime: results.fields['End Time'] && results.fields['End Time'][0],
     }
   })
 }
@@ -93,19 +96,33 @@ function getSubmissionType(id) {
 
 
 exports.handler = async function http(req) {
-  const scheduledInterview = await getScheduledById(req.pathParameters.id).catch(console.error)
-  const submissionType = await getSubmissionType(scheduledInterview.submissionTypeId).catch(console.error)
-  const objectives = await getObjectives(submissionType.objectives).catch(console.error)
+  try {
+    const scheduledInterview = await getScheduledById(req.pathParameters.id).catch(console.error)
+    if (!scheduledInterview || !scheduledInterview.submissionTypeId) {
+      throw new Error('Invalid scheduledInterview.submissionTypeId for requested id')
+    }
+    const submissionType = await getSubmissionType(scheduledInterview.submissionTypeId).catch(console.error)
+    const objectives = await getObjectives(submissionType.objectives).catch(console.error)
 
-  const body = {
-    interview: scheduledInterview,
-    objectives,
-  }
-  return {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'content-type': 'application/json; charset=utf8'
-    },
-    body: JSON.stringify(body)
+    const body = {
+      interview: scheduledInterview,
+      objectives,
+    }
+    return {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'content-type': 'application/json; charset=utf8'
+      },
+      body: JSON.stringify(body)
+    }
+  } catch (error) {
+    console.error(`ERROR: /interview/${req.pathParameters.id}`, error)
+    return {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'content-type': 'application/json; charset=utf8'
+      },
+      body: JSON.stringify({error: error.message, stack: error.stack})
+    }
   }
 }
