@@ -25,6 +25,7 @@ test('get /interview/:id', t => {
   tiny.get({url: `${url}/interview/recfmDZDo4oG3QkP5`})
     .then(function win (result) {
       const json = result.body
+      console.error('JSON', JSON.stringify(json, null, 2))
       t.true(!!json.objectives, 'Got list of Objectives.')
       t.true(!!json.interview, 'Got Interview details.')
       t.true(!!json.interview.displayTitle, 'Has displayTitle in interview details.')
