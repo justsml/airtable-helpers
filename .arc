@@ -10,6 +10,7 @@ get /courses
 get /submission-types
 post /submissions
 get /interview/:id
+get /frehner
 
 @tables
 data
