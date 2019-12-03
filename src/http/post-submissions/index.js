@@ -1,5 +1,14 @@
 const fetch = require('node-fetch')
 
+function buildFieldsParam(fields) {
+  return fields.map(field => `${encodeURIComponent('fields[]')}=${encodeURIComponent(field)}`).join('&')
+}
+
+function buildQueryForIds(ids) {
+  var query = ids.map(id => `RECORD_ID()='${id}'`)
+  return query && query.length > 0 ? `OR(${query.join(',')})` : ''
+}
+
 function getSubmissionType(id) {
   const tableId = 'tblbVmHIKWpDipzUh'
   const filterByFormula = buildQueryForIds([id])
@@ -9,35 +18,36 @@ function getSubmissionType(id) {
       'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
     }
   })
-  .then(res => res.json())
-  .then(result => {
-    const record = result.records[0]
-    // console.log('getSubmissionType', JSON.stringify(record))
-    return {
-      id: record.id,
-      objectives: record.fields.Objectives,
-      displayName: record.fields['Display Name'],
-      studentFacingDescription: record.fields['Student Facing Description'],
-      name: record.fields['Name'],
-      courseId: record.fields['Course'] && record.fields['Course'][0],
-    }
-  })
+    .then(res => res.json())
+    .then(result => {
+      const record = result.records[0]
+      // console.log('getSubmissionType', JSON.stringify(record))
+      return {
+        id: record.id,
+        objectives: record.fields.Objectives,
+        displayName: record.fields['Display Name'],
+        studentFacingDescription: record.fields['Student Facing Description'],
+        name: record.fields['Name'],
+        courseId: record.fields['Course'] && record.fields['Course'][0],
+      }
+    })
 }
 
 async function createSubmissionRecord(s) {
   if (!s.submissionType) throw new Error('submissionType is required')
   if (!s.student) throw new Error('student is required')
   if (!s.reviewerName) throw new Error('reviewerName is required')
-  const objectives = [s.objectivesScored1 && s.objectivesScored1.split(','),
+  const objectives = [
+    s.objectivesScored1 && s.objectivesScored1.split(','),
     s.objectivesScored2 && s.objectivesScored2.split(','),
-    s.objectivesScored3 && s.objectivesScored3.split(',')].flat().sort()
+    s.objectivesScored3 && s.objectivesScored3.split(',')
+  ].flat()
+
   const requiredObjectives = await getSubmissionType(s.submissionType).then(submissionType => {
     return submissionType.objectives.sort()
   })
 
-  for (var i = 0; i < objectives.length; i++) {
-    if objectives[i] != requiredObjectives[i] throw new ERROR('Submitted objectives don\'t match required objectives')
-  }
+  if (objectives.length !== requiredObjectives.length) throw new Error(`Submitted objectives don't match required objectives: ${objectives.length}/${requiredObjectives.length}`)
 
   return {
     fields: {
@@ -63,11 +73,11 @@ function sendData(tableName, data) {
     method: 'POST',
     body: JSON.stringify(data)
   })
-  .then(res => res.json())
-  .then(results => {
-    console.log(tableName, JSON.stringify(results, null, 2))
-    return results
-  })
+    .then(res => res.json())
+    .then(results => {
+      console.log(tableName, JSON.stringify(results, null, 2))
+      return results
+    })
 }
 
 exports.handler = async function http(req) {
