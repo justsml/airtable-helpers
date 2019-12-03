@@ -1,34 +1,64 @@
 const fetch = require('node-fetch')
-// const submission = {
-//   submissionType: 'recxxxxxxxxxx',
-//   objectivesScored1: 'recxxxxxxxxxx,recxxxxxxxxxx,recxxxxxxxxxx,recxxxxxxxxxx',
-//   objectivesScored2: 'recxxxxxxxxxx,recxxxxxxxxxx,recxxxxxxxxxx,recxxxxxxxxxx',
-//   objectivesScored3: 'recxxxxxxxxxx,recxxxxxxxxxx',
-//   reviewerName: 'Dan L',
-//   student: 'recxxxxxxxxxx',
-//   wouldHire: true
-// }
-const MAX_OBJECTIVES = 10
-const MIN_OBJECTIVES = 1
 
-function createSubmissionRecord(s) {
+function buildFieldsParam(fields) {
+  return fields.map(field => `${encodeURIComponent('fields[]')}=${encodeURIComponent(field)}`).join('&')
+}
+
+function buildQueryForIds(ids) {
+  var query = ids.map(id => `RECORD_ID()='${id}'`)
+  return query && query.length > 0 ? `OR(${query.join(',')})` : ''
+}
+
+function getSubmissionType(id) {
+  const tableId = 'tblbVmHIKWpDipzUh'
+  const filterByFormula = buildQueryForIds([id])
+  const fields = buildFieldsParam(['Objectives', 'Display Name', 'Student Facing Description', 'Name', 'Course'])
+  return fetch(`https://api.airtable.com/v0/appVrtcS4vUYVuiD3/${tableId}?filterByFormula=${filterByFormula}&${fields}`, {
+    headers: {
+      'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
+    }
+  })
+    .then(res => res.json())
+    .then(result => {
+      const record = result.records[0]
+      // console.log('getSubmissionType', JSON.stringify(record))
+      return {
+        id: record.id,
+        objectives: record.fields.Objectives,
+        displayName: record.fields['Display Name'],
+        studentFacingDescription: record.fields['Student Facing Description'],
+        name: record.fields['Name'],
+        courseId: record.fields['Course'] && record.fields['Course'][0],
+      }
+    })
+}
+
+async function createSubmissionRecord(s) {
   if (!s.submissionType) throw new Error('submissionType is required')
   if (!s.student) throw new Error('student is required')
   if (!s.reviewerName) throw new Error('reviewerName is required')
-  const objectives = [s.objectivesScored1 && s.objectivesScored1.split(','),
+  const objectives = [
+    s.objectivesScored1 && s.objectivesScored1.split(','),
     s.objectivesScored2 && s.objectivesScored2.split(','),
-    s.objectivesScored3 && s.objectivesScored3.split(',')].flat()
-  if (objectives.length < MIN_OBJECTIVES) throw new Error('No objectives found')
-  if (objectives.length > MAX_OBJECTIVES) throw new Error('Too many objectives found')
+    s.objectivesScored3 && s.objectivesScored3.split(',')
+  ].flat()
+
+  const requiredObjectives = await getSubmissionType(s.submissionType).then(submissionType => {
+    return submissionType.objectives.sort()
+  })
+
+  if (objectives.length !== requiredObjectives.length) throw new Error(`Submitted objectives don't match required objectives: ${objectives.length}/${requiredObjectives.length}`)
+
   return {
     fields: {
       'Submission Type': [s.submissionType],
       'Objectives Scored 1': s.objectivesScored1 && s.objectivesScored1.split(','),
       'Objectives Scored 2': s.objectivesScored2 && s.objectivesScored2.split(','),
       'Objectives Scored 3': s.objectivesScored3 && s.objectivesScored3.split(','),
-      'Reviewer Name': s.reviewerName,
+      'Reviewer': [s.reviewer],
       'Student': [s.student],
-      'Would Hire': s.wouldHire ? 'Yes' : 'No'
+      'Internal Reviewer Notes': s.internalNotes,
+      'Student Facing Reviewer Notes': s.studentFacingNotes
     }
   }
 }
@@ -43,65 +73,13 @@ function sendData(tableName, data) {
     method: 'POST',
     body: JSON.stringify(data)
   })
-  .then(res => res.json())
-  .then(results => {
-    console.log(tableName, JSON.stringify(results, null, 2))
-    return results
-  })
+    .then(res => res.json())
+    .then(results => {
+      console.log(tableName, JSON.stringify(results, null, 2))
+      return results
+    })
 }
-/*
-curl -v -X POST https://api.airtable.com/v0/appVrtcS4vUYVuiD3/Submissions \
-  -H "Authorization: Bearer keyIbzA1CubaOLW1w" \
-  -H "Content-Type: application/json" \
-  --data '{
-  "records": [
-    {
-      "fields": {
-        "Submission Type": [
-          "rec7So00sMXJpZHBX"
-        ],
-        "Objectives Scored 2": [
-          "rec600kDd9VFPqLvh",
-          "recCzy8swmeFY6ZLQ",
-          "recyirI11seVGWdj5"
-        ],
-        "Objectives Scored 3": [
-          "reckGBlhkRa3iW8MN",
-          "rec5RxAXmONcsWEJ6",
-          "recNswqDOY3oprnzX"
-        ],
-        "Reviewer Name": "Sean Chen",
-        "Student": [
-          "recKo14W4S4mo8hYD"
-        ],
-        "Would Hire": "Yes"
-      }
-    },
-    {
-      "fields": {
-        "Submission Type": [
-          "rec7So00sMXJpZHBX"
-        ],
-        "Objectives Scored 2": [
-          "rec600kDd9VFPqLvh",
-          "recCzy8swmeFY6ZLQ",
-          "rec5RxAXmONcsWEJ6",
-          "recyirI11seVGWdj5"
-        ],
-        "Objectives Scored 3": [
-          "reckGBlhkRa3iW8MN",
-          "recNswqDOY3oprnzX"
-        ],
-        "Reviewer Name": "Sean Chen",
-        "Student": [
-          "recYrTVkoJSqY6MaJ"
-        ],
-        "Would Hire": "Yes"
-      }
-    }
-  ]
-}'
-*/
+
 exports.handler = async function http(req) {
   console.log('queryStringParameters', req.queryStringParameters)
   const payload = {
