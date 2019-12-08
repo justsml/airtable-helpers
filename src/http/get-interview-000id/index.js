@@ -67,6 +67,14 @@ function getObjectives(objectiveIds) {
         score3: record.fields['3'],
         sort: record.fields['Sort']
       }
+    }).sort((item1, item2) => { 
+      if (item1.sort < item2.sort) {
+        return -1
+      } else if (item1.sort == item2.sort) {
+        return 0
+      } else {
+        return 1
+      }
     })
   })
 }

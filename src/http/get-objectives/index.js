@@ -2,7 +2,7 @@ const fetch = require('node-fetch')
 
 // Endorsement%20Requirements
 function getObjectives() {
-  return fetch("https://api.airtable.com/v0/appVrtcS4vUYVuiD3/Objectives?maxRecords=250&view=Grid%20view", {
+  return fetch("https://api.airtable.com/v0/appVrtcS4vUYVuiD3/Objectives", {
     headers: {
       'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`
     }
@@ -21,7 +21,8 @@ function getObjectives() {
         ],
         display: record.fields['Display Name'],
         descriptionForReviewer: record.fields['Reviewer Facing Description'],
-        descriptionForStudent: ['Student Facing Description']
+        descriptionForStudent: record.fields['Student Facing Description'],
+        sort: record.fields.Sort
       }
     })
   })
