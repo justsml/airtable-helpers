@@ -45,7 +45,7 @@ function getScheduledById(id) {
 
 function getObjectives(objectiveIds) {
   const filterByFormula = buildQueryForIds(objectiveIds)
-  const fields = ['Display Name', 'Objective', 'Reviewer Facing Description', 'Student Facing Description', '1', '2', '3']
+  const fields = ['Display Name', 'Objective', 'Reviewer Facing Description', 'Student Facing Description', '1', '2', '3', 'Sort']
   // console.log('filterByFormula', filterByFormula)
   return fetch(`https://api.airtable.com/v0/appVrtcS4vUYVuiD3/Objectives?filterByFormula=${filterByFormula}&${buildFieldsParam(fields)}`, {
     headers: {
@@ -65,6 +65,7 @@ function getObjectives(objectiveIds) {
         score1: record.fields['1'],
         score2: record.fields['2'],
         score3: record.fields['3'],
+        sort: record.fields['Sort']
       }
     })
   })
