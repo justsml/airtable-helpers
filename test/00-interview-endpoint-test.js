@@ -22,7 +22,7 @@ test('Start sandbox', async t => {
 
 test('get /interview/:id', t => {
   t.plan(3)
-  tiny.get({url: `${url}/interview/recfmDZDo4oG3QkP5`})
+  tiny.get({url: `${url}/interview/rectfuhKKuktO1gAI`})
     .then(function win (result) {
       const json = result.body
       console.error('JSON', JSON.stringify(json, null, 2))
