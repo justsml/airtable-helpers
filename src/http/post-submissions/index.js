@@ -36,7 +36,7 @@ function getSubmissionType(id) {
 async function createSubmissionRecord(s) {
   if (!s.submissionType) throw new Error('submissionType is required')
   if (!s.student) throw new Error('student is required')
-  if (!s.reviewerName) throw new Error('reviewerName is required')
+  if (!s.reviewer) throw new Error('reviewer is required')
   const objectives = [
     s.objectivesScored1 && s.objectivesScored1.split(','),
     s.objectivesScored2 && s.objectivesScored2.split(','),
