@@ -1,4 +1,6 @@
 const fetch = require('node-fetch')
+let arc = require('@architect/functions')
+let parseBody = arc.http.helpers.bodyParser
 
 function buildFieldsParam(fields) {
   return fields.map(field => `${encodeURIComponent('fields[]')}=${encodeURIComponent(field)}`).join('&')
@@ -21,7 +23,6 @@ function getSubmissionType(id) {
     .then(res => res.json())
     .then(result => {
       const record = result.records[0]
-      // console.log('getSubmissionType', JSON.stringify(record))
       return {
         id: record.id,
         objectives: record.fields.Objectives,
@@ -37,30 +38,40 @@ async function createSubmissionRecord(s) {
   if (!s.submissionType) throw new Error('submissionType is required')
   if (!s.student) throw new Error('student is required')
   if (!s.reviewer) throw new Error('reviewer is required')
-  const objectives = [
-    s.objectivesScored1 && s.objectivesScored1.split(','),
-    s.objectivesScored2 && s.objectivesScored2.split(','),
-    s.objectivesScored3 && s.objectivesScored3.split(',')
-  ].flat()
 
   const requiredObjectives = await getSubmissionType(s.submissionType).then(submissionType => {
     return submissionType.objectives.sort()
   })
 
-  if (objectives.length !== requiredObjectives.length) throw new Error(`Submitted objectives don't match required objectives: ${objectives.length}/${requiredObjectives.length}`)
+  const submittedObjectives = Object.entries(s.objectives).map(([key, value]) => key)
+  const unsubmittedObjectives = requiredObjectives.reduce((unsubmitted, objective) => {
+    if (!submittedObjectives.some(id => objective === id)) {
+      return unsubmitted.concat([objective])
+    }
 
-  return {
+    return unsubmitted
+  }, [])
+
+  if (unsubmittedObjectives.length > 0) throw new Error(`The following required objectives are missing: ${unsubmittedObjectives}`)
+
+  const objectivesScored1 = Object.entries(s.objectives).filter(([key, value]) => value === 1).map(([key, value]) => key)
+  const objectivesScored2 = Object.entries(s.objectives).filter(([key, value]) => value === 2).map(([key, value]) => key)
+  const objectivesScored3 = Object.entries(s.objectives).filter(([key, value]) => value === 3).map(([key, value]) => key)
+
+  const record = {
     fields: {
       'Submission Type': [s.submissionType],
-      'Objectives Scored 1': s.objectivesScored1 && s.objectivesScored1.split(','),
-      'Objectives Scored 2': s.objectivesScored2 && s.objectivesScored2.split(','),
-      'Objectives Scored 3': s.objectivesScored3 && s.objectivesScored3.split(','),
+      'Objectives Scored 1': objectivesScored1,
+      'Objectives Scored 2': objectivesScored2,
+      'Objectives Scored 3': objectivesScored3,
       'Reviewer': [s.reviewer],
       'Student': [s.student],
       'Internal Reviewer Notes': s.internalNotes,
       'Student Facing Reviewer Notes': s.studentFacingNotes
     }
   }
+
+  return record
 }
 
 
@@ -81,12 +92,14 @@ function sendData(tableName, data) {
 }
 
 exports.handler = async function http(req) {
-  console.log('queryStringParameters', req.queryStringParameters)
+  let body = parseBody(req)
+  const record = await createSubmissionRecord(body)
   const payload = {
     records: [
-      createSubmissionRecord(req.queryStringParameters)
+      record
     ]
   }
+
   const results = await sendData('Submissions', payload)
   return {
     headers: {
