@@ -35,6 +35,7 @@ function getScheduledById(id) {
       id: results.id,
       studentId: results.fields.Student && results.fields.Student[0],
       submissionTypeId: results.fields && results.fields.Type[0],
+      reviewerId: results.fields && results.fields.Reviewer[0],
       displayTitle: results.fields.Name,
       description: results.fields['Calendar Invite Name'],
       startTime: results.fields['Start Time'] && results.fields['Start Time'][0],
