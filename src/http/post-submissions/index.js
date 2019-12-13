@@ -86,7 +86,6 @@ function sendData(tableName, data) {
   })
     .then(res => res.json())
     .then(results => {
-      console.log(tableName, JSON.stringify(results, null, 2))
       return results
     })
 }

@@ -44,7 +44,6 @@ test('post /submissions', t => {
     data: payload,
     headers: {'Content-Type': 'application/json'}
   }).then(result => {
-    console.log(result.body.records)
     t.true(result.body.records.length === 1, 'Expected 1 record')
     cleanup(result.body.records[0].id).then(result => {
       t.true(result.body.deleted, 'Expected deleted to be true')
@@ -71,5 +70,3 @@ function cleanup(id) {
     headers: {'Authorization': `Bearer ${process.env.AIRTABLE_API_KEY}`}
   })
 }
-
-let didNotLoad = 'You are likely seeing 404 or ECONNREFUSED errors because you do not have a `get /` HTTP function and also do not have a `public/index.html` file\nPlease make use of one or the other to respond to web requests at the root of your application'
