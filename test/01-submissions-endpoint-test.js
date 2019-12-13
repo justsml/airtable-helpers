@@ -21,7 +21,7 @@ test('Start sandbox', async t => {
 
 
 test('post /submissions', t => {
-  t.plan(2)
+  t.plan(3)
 
   const payload = {
     "submissionType": "reca6jeURsOqzvjQD",
@@ -44,11 +44,13 @@ test('post /submissions', t => {
     data: payload,
     headers: {'Content-Type': 'application/json'}
   }).then(result => {
+    t.true(!!result.body.records, 'Expected submission results')
     t.true(result.body.records.length === 1, 'Expected 1 record')
-    cleanup(result.body.records[0].id).then(result => {
+    return cleanup(result.body.records[0].id).then(result => {
       t.true(result.body.deleted, 'Expected deleted to be true')
     })
   })
+  .catch(err => t.fail(err))
 })
 
 test('Shut down sandbox', t=> {
